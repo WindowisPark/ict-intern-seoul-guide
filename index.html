@@ -103,9 +103,11 @@ input[type=search]{flex:1;min-width:220px} input:focus,select:focus{border-color
 .pbtn:hover{border-color:var(--brand);color:var(--brand-d)}
 .pbtn.on{background:var(--brand);border-color:var(--brand);color:#fff;font-weight:700}
 
-#tray{position:fixed;right:20px;bottom:20px;width:286px;background:#fff;border:1px solid var(--line2);
+#tray{position:fixed;right:16px;bottom:16px;width:min(300px,calc(100vw - 32px));background:#fff;border:1px solid var(--line2);
   border-radius:16px;box-shadow:0 14px 44px rgba(40,70,50,.18);z-index:50;overflow:hidden}
-#tray .th{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+#tray.min{width:auto}
+#tray .th{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:12px 15px;border-bottom:1px solid var(--line);cursor:pointer;user-select:none}
+#tray.min .th{border-bottom:0}
 #tray .th b{font-size:13.5px} #tray .th .cnt{font-size:12px;color:var(--faint);font-weight:600}
 #tray .body{padding:6px 14px}
 .slot{display:flex;align-items:center;gap:10px;padding:9px 2px;border-bottom:1px dashed var(--line)}
@@ -122,13 +124,16 @@ input[type=search]{flex:1;min-width:220px} input:focus,select:focus{border-color
 #tray .tf button{flex:1;font-size:12px;border:1px solid var(--line2);background:#fff;border-radius:8px;padding:8px;cursor:pointer;color:var(--sub);font-family:inherit}
 #tray .tf button:hover{border-color:var(--brand);color:var(--brand-d)}
 #tray.min .body,#tray.min .tf{display:none}
-#tray .th .cnt:after{content:" ▾";color:var(--faint)} #tray.min .th .cnt:after{content:" ▸"}
-@media(max-width:720px){#tray{right:10px;left:10px;width:auto;bottom:10px}}
+#tray .th .cnt:after{content:" ▾";color:var(--faint)} #tray.min .th .cnt:after{content:" ▴"}
+@media(max-width:600px){#tray{right:12px;bottom:12px}#tray:not(.min){left:12px;width:auto}}
 .empty{text-align:center;color:var(--faint);padding:50px}
 footer{color:var(--faint);font-size:12.5px;text-align:center;padding:16px 0 56px;line-height:2}
 footer a{color:var(--brand-d)}
 @media(max-width:640px){.facets{grid-template-columns:1fr}.facet.exp{border-right:0;border-bottom:1px solid var(--line)}}
-@media(max-width:600px){.hero{padding:44px 22px 30px}h1{font-size:24px}.card{padding:22px 20px}.conf{display:none}.summary{width:100%}}
+@media(max-width:600px){.hero{padding:40px 20px 28px}h1{font-size:22px}.lead{font-size:14px}.card{padding:20px 18px}.conf{display:none}
+  .summary{width:100%}.pill{flex:1;padding:12px 10px;text-align:center}.pill b{justify-content:center}
+  .brandmark{flex-wrap:wrap}.brandmark .div,.brandmark .sub{display:none}
+  .metaline{gap:6px}.oneliner{font-size:15.5px}}
 </style>
 </head>
 <body>
@@ -283,7 +288,12 @@ document.getElementById('trayBody').addEventListener('click',e=>{
   const r=e.target.closest('.rm'); if(!r)return;
   delete picks[r.dataset.rm];savePicks();render();renderTray();
 });
-document.getElementById('trayToggle').addEventListener('click',()=>document.getElementById('tray').classList.toggle('min'));
+const TKEY='ict_tray_open';
+if(localStorage.getItem(TKEY)!=='1') document.getElementById('tray').classList.add('min');
+document.getElementById('trayToggle').addEventListener('click',()=>{
+  const t=document.getElementById('tray');t.classList.toggle('min');
+  try{localStorage.setItem(TKEY,t.classList.contains('min')?'0':'1');}catch(e){}
+});
 document.getElementById('clearPicks').addEventListener('click',()=>{if(confirm('담아둔 지망을 모두 비울까요?')){picks={};savePicks();render();renderTray();}});
 document.getElementById('copyPicks').addEventListener('click',()=>{
   const lines=['1','2','3'].filter(r=>picks[r]).map(r=>`${r}지망: ${picks[r]}`);
